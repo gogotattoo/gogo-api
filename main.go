@@ -7,36 +7,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/gorilla/mux"
 )
-
-type tattoo struct {
-	ID    string `json:"id,omitempty"`
-	Link  string `json:"link,omitempty"`
-	Title string `json:"title,omitempty" toml:"title"`
-	//MadeLocation Address  `json:"made_at"`
-	DurationMin int    `json:"duration_min,omitempty"`
-	Gender      string `json:"gender,omitempty"`
-	Extra       string `json:"extra,omitempty"`
-	Article     string `json:"article,omitempty"`
-
-	MadeDate        string   `json:"tattoodate,omitempty" toml:"tattoodate"`
-	PublishDate     string   `json:"date,omitempty"`
-	Tags            []string `json:"tags,omitempty"`
-	BodyParts       []string `json:"bodypart,omitempty"`
-	ImageIpfs       string   `json:"image_ipfs" toml:"image_ipfs"`
-	ImagesIpfs      []string `json:"images_ipfs,omitempty" toml:"images_ipfs"`
-	LocationCity    string   `json:"made_at_city" toml:"location_city"`
-	LocationCountry string   `json:"made_at_country" toml:"location_country"`
-	MadeAtShop      string   `json:"made_at_shop,omitempty" toml:"made_at_shop"`
-}
-
-// Address stores the location information where the work was made
-// type Address struct {
-// 	City    string `json:"city,omitempty"`
-// 	Country string `json:"country,omitempty"`
-// 	Shop    string `json:"shop,omitempty"`
-// }
 
 var tattoos []tattoo
 
@@ -59,6 +32,23 @@ func Tattoo(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 	json.NewEncoder(w).Encode(NewTattoo("", "brr", "", ""))
+}
+
+// Tattoo shows info on a single tattoo work by id
+func TattooToml(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "application/toml")
+	params := mux.Vars(req)
+	for _, item := range tattoos {
+		if item.ID == params["id"] {
+			//fmt.Fprint(w, toml.En)
+			er := toml.NewEncoder(w).Encode(item)
+			if er != nil {
+				log.Println(er)
+			}
+			return
+		}
+	}
+	toml.NewEncoder(w).Encode(NewTattoo("", "brr", "", ""))
 }
 
 // Tattoos returns the list of all tattoos
@@ -131,6 +121,7 @@ func main() {
 	router.HandleFunc("/tattoo", Tattoos).Methods("GET")
 	router.HandleFunc("/tattoo/refresh", TattooRefresh).Methods("GET")
 	router.HandleFunc("/tattoo/{id}", Tattoo).Methods("GET")
+	router.HandleFunc("/tattoo/{id}.toml", TattooToml).Methods("GET")
 	router.HandleFunc("/tattoo/{id}", CreateTattoo).Methods("POST")
 	router.HandleFunc("/tattoo/{id}", DeleteTattoo).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":12345", router))
