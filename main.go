@@ -8,19 +8,12 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/gogotattoo/common/models"
 	"github.com/gorilla/mux"
 )
 
-var tattoos []tattoo
-
-// NewTattoo returns a new tattoo , requires id, the unique title of the new work
-// link, also unique and final image ipfs hash
-func NewTattoo(id, title, link, hash string) (t tattoo) {
-	t.ID = id
-	t.Link = link
-	t.ImageIpfs = hash
-	return
-}
+var tattoos []models.Tattoo
+var hennas []models.Henna
 
 // Tattoo shows info on a single tattoo work by id
 func Tattoo(w http.ResponseWriter, req *http.Request) {
@@ -31,12 +24,11 @@ func Tattoo(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 	}
-	json.NewEncoder(w).Encode(NewTattoo("", "brr", "", ""))
+	json.NewEncoder(w).Encode(models.NewTattoo("", "brr", "", ""))
 }
 
-// Tattoo shows info on a single tattoo work by id
+// TattooToml shows info of a single tattoo work by id in toml format
 func TattooToml(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("Content-Type", "application/toml")
 	params := mux.Vars(req)
 	for _, item := range tattoos {
 		if item.ID == params["id"] {
@@ -48,7 +40,7 @@ func TattooToml(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 	}
-	toml.NewEncoder(w).Encode(NewTattoo("", "brr", "", ""))
+	toml.NewEncoder(w).Encode(models.NewTattoo("", "brr", "", ""))
 }
 
 // Tattoos returns the list of all tattoos
@@ -88,7 +80,7 @@ func CreateTattoo(w http.ResponseWriter, req *http.Request) {
 	log.Println("POST /tattoo")
 	params := mux.Vars(req)
 	defer req.Body.Close()
-	var tat tattoo
+	var tat models.Tattoo
 	err := json.NewDecoder(req.Body).Decode(&tat)
 	log.Println("TITLE\n", tat.Title)
 	if err != nil {
@@ -99,8 +91,8 @@ func CreateTattoo(w http.ResponseWriter, req *http.Request) {
 	tat.ID = params["id"]
 	tattoos = append(tattoos, tat)
 	m, _ := json.Marshal(tat)
-	log.Println("TATTOO\n", string(m))
-	json.NewEncoder(w).Encode(tattoos)
+	log.Println("TATTOO\n", string(m)+"\n")
+	json.NewEncoder(w).Encode(tat)
 }
 
 // DeleteTattoo deletes a tattoo by id from the memory
@@ -115,14 +107,41 @@ func DeleteTattoo(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(tattoos)
 }
 
+// Hennas returns the list of all hennas
+func Hennas(w http.ResponseWriter, req *http.Request) {
+	json.NewEncoder(w).Encode(hennas)
+}
+
+// CreateHenna adds a new henna object
+func CreateHenna(w http.ResponseWriter, req *http.Request) {
+	log.Println("POST /henna")
+	params := mux.Vars(req)
+	defer req.Body.Close()
+	var hen models.Henna
+	err := json.NewDecoder(req.Body).Decode(&hen)
+	log.Println("TITLE\n", hen.Title)
+	if err != nil {
+		log.Println("ERROR\n", err)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+	hen.ID = params["id"]
+	hennas = append(hennas, hen)
+	m, _ := json.Marshal(hen)
+	log.Println("HENNA\n", string(m)+"\n")
+	json.NewEncoder(w).Encode(hen)
+}
+
 func main() {
 	router := mux.NewRouter()
-	tattoos = append(tattoos, NewTattoo("0", "Young forever", "gogo/tattoo/young_forever", "QmUgcdgXS7RGC837EzDkHEMaWtPgPAMN9ntNeMbXsy98fi"))
 	router.HandleFunc("/tattoo", Tattoos).Methods("GET")
 	router.HandleFunc("/tattoo/refresh", TattooRefresh).Methods("GET")
 	router.HandleFunc("/tattoo/{id}", Tattoo).Methods("GET")
 	router.HandleFunc("/tattoo/{id}.toml", TattooToml).Methods("GET")
 	router.HandleFunc("/tattoo/{id}", CreateTattoo).Methods("POST")
 	router.HandleFunc("/tattoo/{id}", DeleteTattoo).Methods("DELETE")
+
+	router.HandleFunc("/henna", Hennas).Methods("GET")
+	router.HandleFunc("/henna/{id}", CreateHenna).Methods("POST")
 	log.Fatal(http.ListenAndServe(":12345", router))
 }
