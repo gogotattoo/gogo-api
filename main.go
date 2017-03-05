@@ -14,6 +14,8 @@ import (
 
 var tattoos []models.Tattoo
 var hennas []models.Henna
+var piercing []models.Piercing
+var designs []models.Design
 
 // Tattoo shows info on a single tattoo work by id
 func Tattoo(w http.ResponseWriter, req *http.Request) {
@@ -130,6 +132,56 @@ func CreateHenna(w http.ResponseWriter, req *http.Request) {
 	m, _ := json.Marshal(hen)
 	log.Println("HENNA\n", string(m)+"\n")
 	json.NewEncoder(w).Encode(hen)
+}
+
+// CreateDesign adds a new design object
+func CreateDesign(w http.ResponseWriter, req *http.Request) {
+	log.Println("POST /design")
+	params := mux.Vars(req)
+	defer req.Body.Close()
+	var des models.Design
+	err := json.NewDecoder(req.Body).Decode(&des)
+	log.Println("TITLE\n", des.Title)
+	if err != nil {
+		log.Println("ERROR\n", err)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+	des.ID = params["id"]
+	designs = append(designs, des)
+	m, _ := json.Marshal(des)
+	log.Println("DESIGN\n", string(m)+"\n")
+	json.NewEncoder(w).Encode(des)
+}
+
+// Designs returns the list of all designs
+func Designs(w http.ResponseWriter, req *http.Request) {
+	json.NewEncoder(w).Encode(designs)
+}
+
+// CreatePiercing adds a new design artwork
+func CreatePiercing(w http.ResponseWriter, req *http.Request) {
+	log.Println("POST /piercing")
+	params := mux.Vars(req)
+	defer req.Body.Close()
+	var per models.Piercing
+	err := json.NewDecoder(req.Body).Decode(&per)
+	log.Println("TITLE\n", per.Title)
+	if err != nil {
+		log.Println("ERROR\n", err)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+	per.ID = params["id"]
+	piercing = append(piercing, per)
+	m, _ := json.Marshal(per)
+	log.Println("PIERCING\n", string(m)+"\n")
+	json.NewEncoder(w).Encode(per)
+}
+
+// Piercing returns the list of all piercing works
+func Piercing(w http.ResponseWriter, req *http.Request) {
+	json.NewEncoder(w).Encode(piercing)
 }
 
 func main() {
