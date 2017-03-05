@@ -9,6 +9,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/gogotattoo/common/models"
+	"github.com/gogotattoo/gogo-api/gogo"
 	"github.com/gorilla/mux"
 )
 
@@ -16,6 +17,19 @@ var tattoos []models.Tattoo
 var hennas []models.Henna
 var piercing []models.Piercing
 var designs []models.Design
+
+var gogoTattoo []models.Tattoo
+
+// GogoTattoo returns the list of all gogo's tattoos actually published to git repos
+func GogoTattoo(w http.ResponseWriter, req *http.Request) {
+	json.NewEncoder(w).Encode(gogoTattoo)
+}
+
+// GogoTattooRefresh returns the list of all tattoos
+func GogoTattooRefresh(w http.ResponseWriter, req *http.Request) {
+	gogoTattoo := gogo.Refresh()
+	json.NewEncoder(w).Encode(gogoTattoo)
+}
 
 // Tattoo shows info on a single tattoo work by id
 func Tattoo(w http.ResponseWriter, req *http.Request) {
@@ -60,21 +74,6 @@ func getJSON(url string, target interface{}) (io.ReadCloser, error) {
 	//defer r.Body.Close()
 	t := r.Body
 	return t, json.NewDecoder(r.Body).Decode(target)
-}
-
-// TattooRefresh returns the list of all tattoos
-func TattooRefresh(w http.ResponseWriter, req *http.Request) {
-
-	// foo2 := F[]struct {
-	// 	Name string
-	// }
-	// r, err := getJSON("https://api.github.com/repos/gogotattoo/gogo/contents/content/tattoo?ref=master",
-	// 	foo2)
-	// if err != nil {
-	// 	json.NewEncoder(w).Encode(err)
-	// }
-	m, _ := json.Marshal(req.URL)
-	w.Write(m)
 }
 
 // CreateTattoo adds a new tattoo to the memory
@@ -187,7 +186,6 @@ func Piercing(w http.ResponseWriter, req *http.Request) {
 func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/tattoo", Tattoos).Methods("GET")
-	router.HandleFunc("/tattoo/refresh", TattooRefresh).Methods("GET")
 	router.HandleFunc("/tattoo/{id}", Tattoo).Methods("GET")
 	router.HandleFunc("/tattoo/{id}.toml", TattooToml).Methods("GET")
 	router.HandleFunc("/tattoo/{id}", CreateTattoo).Methods("POST")
@@ -201,5 +199,8 @@ func main() {
 
 	router.HandleFunc("/piercing", Piercing).Methods("GET")
 	router.HandleFunc("/piercing/{id}", CreatePiercing).Methods("POST")
+
+	router.HandleFunc("/tattoo/gogo", GogoTattoo).Methods("GET")
+	router.HandleFunc("/tattoo/gogo/refresh", GogoTattooRefresh).Methods("GET")
 	log.Fatal(http.ListenAndServe(":12345", router))
 }
