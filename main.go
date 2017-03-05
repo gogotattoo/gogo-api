@@ -195,5 +195,11 @@ func main() {
 
 	router.HandleFunc("/henna", Hennas).Methods("GET")
 	router.HandleFunc("/henna/{id}", CreateHenna).Methods("POST")
+
+	router.HandleFunc("/design", Designs).Methods("GET")
+	router.HandleFunc("/design/{id}", CreateDesign).Methods("POST")
+
+	router.HandleFunc("/piercing", Piercing).Methods("GET")
+	router.HandleFunc("/piercing/{id}", CreatePiercing).Methods("POST")
 	log.Fatal(http.ListenAndServe(":12345", router))
 }
