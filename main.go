@@ -188,8 +188,8 @@ func main() {
 	router.HandleFunc("/tattoo", Tattoos).Methods("GET")
 	router.HandleFunc("/tattoo/gogo", GogoTattoo).Methods("GET")
 	router.HandleFunc("/tattoo/gogo/refresh", GogoTattooRefresh).Methods("GET")
-	router.HandleFunc("/tattoo/{id}", Tattoo).Methods("GET")
-	router.HandleFunc("/tattoo/{id}.toml", TattooToml).Methods("GET")
+	//router.HandleFunc("/tattoo/{id}", Tattoo).Methods("GET")
+	//router.HandleFunc("/tattoo/{id}.toml", TattooToml).Methods("GET")
 	router.HandleFunc("/tattoo/{id}", CreateTattoo).Methods("POST")
 	router.HandleFunc("/tattoo/{id}", DeleteTattoo).Methods("DELETE")
 
