@@ -20,14 +20,14 @@ var designs []models.Design
 
 var gogoTattoo []models.Tattoo
 
-// GogoTattoo returns the list of all gogo's tattoos actually published to git repos
-func GogoTattoo(w http.ResponseWriter, req *http.Request) {
+// GogoTattooRefresh returns the list of all tattoos
+func GogoTattooRefresh(w http.ResponseWriter, req *http.Request) {
+	gogoTattoo = gogo.Refresh()
 	json.NewEncoder(w).Encode(gogoTattoo)
 }
 
-// GogoTattooRefresh returns the list of all tattoos
-func GogoTattooRefresh(w http.ResponseWriter, req *http.Request) {
-	gogoTattoo := gogo.Refresh()
+// GogoTattoo returns the list of all gogo's tattoos actually published to git repos
+func GogoTattoo(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(gogoTattoo)
 }
 
@@ -186,6 +186,8 @@ func Piercing(w http.ResponseWriter, req *http.Request) {
 func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/tattoo", Tattoos).Methods("GET")
+	router.HandleFunc("/tattoo/gogo", GogoTattoo).Methods("GET")
+	router.HandleFunc("/tattoo/gogo/refresh", GogoTattooRefresh).Methods("GET")
 	router.HandleFunc("/tattoo/{id}", Tattoo).Methods("GET")
 	router.HandleFunc("/tattoo/{id}.toml", TattooToml).Methods("GET")
 	router.HandleFunc("/tattoo/{id}", CreateTattoo).Methods("POST")
@@ -200,7 +202,5 @@ func main() {
 	router.HandleFunc("/piercing", Piercing).Methods("GET")
 	router.HandleFunc("/piercing/{id}", CreatePiercing).Methods("POST")
 
-	router.HandleFunc("/tattoo/gogo", GogoTattoo).Methods("GET")
-	router.HandleFunc("/tattoo/gogo/refresh", GogoTattooRefresh).Methods("GET")
 	log.Fatal(http.ListenAndServe(":12345", router))
 }
