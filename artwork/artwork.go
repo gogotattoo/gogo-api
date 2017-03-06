@@ -75,5 +75,9 @@ func Refresh(artistName, artType string) models.Artworks {
 		works = append(works, work)
 	}
 	sort.Sort(works)
+	for i := works.Len()/2 - 1; i >= 0; i-- {
+		j := works.Len() - 1 - i
+		works.Swap(i, j)
+	}
 	return works
 }
