@@ -18,12 +18,11 @@ var hennas []models.Henna
 var piercing []models.Piercing
 var designs []models.Design
 
-var artistTattoo map[string][]models.Tattoo
+var artistTattoo = make(map[string][]models.Tattoo)
 
 // ArtistTattooRefresh returns the list of all tattoos
 func ArtistTattooRefresh(w http.ResponseWriter, req *http.Request) {
 	artistName := mux.Vars(req)["name"]
-	artistTattoo = make(map[string][]models.Tattoo)
 	artistTattoo[artistName] = tattoo.Refresh(artistName)
 	json.NewEncoder(w).Encode(artistTattoo[artistName])
 }
