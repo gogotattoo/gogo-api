@@ -9,7 +9,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/gogotattoo/common/models"
-	"github.com/gogotattoo/gogo-api/gogo"
+	"github.com/gogotattoo/gogo-api/tattoo"
 	"github.com/gorilla/mux"
 )
 
@@ -20,14 +20,14 @@ var designs []models.Design
 
 var gogoTattoo []models.Tattoo
 
-// GogoTattooRefresh returns the list of all tattoos
-func GogoTattooRefresh(w http.ResponseWriter, req *http.Request) {
-	gogoTattoo = gogo.Refresh()
+// ArtistTattooRefresh returns the list of all tattoos
+func ArtistTattooRefresh(w http.ResponseWriter, req *http.Request) {
+	gogoTattoo = tattoo.Refresh(mux.Args(req)["name"])
 	json.NewEncoder(w).Encode(gogoTattoo)
 }
 
-// GogoTattoo returns the list of all gogo's tattoos actually published to git repos
-func GogoTattoo(w http.ResponseWriter, req *http.Request) {
+// ArtistTattoo returns the list of all artists' tattoos actually published to git repos
+func ArtistTattoo(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(gogoTattoo)
 }
 
@@ -186,8 +186,8 @@ func Piercing(w http.ResponseWriter, req *http.Request) {
 func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/tattoo", Tattoos).Methods("GET")
-	router.HandleFunc("/tattoo/gogo", GogoTattoo).Methods("GET")
-	router.HandleFunc("/tattoo/gogo/refresh", GogoTattooRefresh).Methods("GET")
+	router.HandleFunc("/tattoo/{name}", GogoTattoo).Methods("GET")
+	router.HandleFunc("/tattoo/{name}/refresh", GogoTattooRefresh).Methods("GET")
 	//router.HandleFunc("/tattoo/{id}", Tattoo).Methods("GET")
 	//router.HandleFunc("/tattoo/{id}.toml", TattooToml).Methods("GET")
 	router.HandleFunc("/tattoo/{id}", CreateTattoo).Methods("POST")

@@ -2,6 +2,7 @@ package gogo
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -32,16 +33,16 @@ type file struct {
 }
 
 const (
-	GitURL = "https://api.github.com/repos/gogotattoo/gogo/contents/content/tattoo?ref=master"
+	GitURL = "https://api.github.com/repos/gogotattoo/%s/contents/content/tattoo?ref=master"
 )
 
 var myClient = &http.Client{Timeout: 100 * time.Second}
 
 // Refresh since we are currntly not using a database, instead all the tattoo data is
 // on git services. Let's update our in memory database by utilizing github api.
-func Refresh() []models.Tattoo {
+func Refresh(artistName string) []models.Tattoo {
 	var files []file
-	of, err := myClient.Get(GitURL)
+	of, err := myClient.Get(fmt.Sprintf(GitURL, artistName))
 	if err != nil {
 		log.Panic(err)
 	}
