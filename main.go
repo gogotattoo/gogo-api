@@ -9,7 +9,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/gogotattoo/common/models"
-	"github.com/gogotattoo/gogo-api/tattoo"
+	"github.com/gogotattoo/gogo-api/artwork"
 	"github.com/gorilla/mux"
 )
 
@@ -18,18 +18,22 @@ var hennas []models.Henna
 var piercing []models.Piercing
 var designs []models.Design
 
-var artistTattoo = make(map[string][]models.Tattoo)
+var artistWorks = make(map[string][]interface{})
 
-// ArtistTattooRefresh returns the list of all tattoos
-func ArtistTattooRefresh(w http.ResponseWriter, req *http.Request) {
-	artistName := mux.Vars(req)["name"]
-	artistTattoo[artistName] = tattoo.Refresh(artistName)
-	json.NewEncoder(w).Encode(artistTattoo[artistName])
+// ArtistArtworkRefresh returns the list of all tattoos
+func ArtistArtworkRefresh(artType string) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		artistName := mux.Vars(r)["name"]
+		artistWorks[artistName+"/"+artType] = artwork.Refresh(artistName, artType)
+		json.NewEncoder(w).Encode(artistWorks[artistName+"/"+artType])
+	}
 }
 
-// ArtistTattoo returns the list of all artists' tattoos actually published to git repos
-func ArtistTattoo(w http.ResponseWriter, req *http.Request) {
-	json.NewEncoder(w).Encode(artistTattoo[mux.Vars(req)["name"]])
+// ArtistArtwork returns the list of all artists' tattoos actually published to git repos
+func ArtistArtwork(artType string) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(artistWorks[mux.Vars(r)["name"]+"/"+artType])
+	}
 }
 
 // Tattoo shows info on a single tattoo work by id
@@ -187,8 +191,6 @@ func Piercing(w http.ResponseWriter, req *http.Request) {
 func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/tattoo", Tattoos).Methods("GET")
-	router.HandleFunc("/tattoo/{name}", ArtistTattoo).Methods("GET")
-	router.HandleFunc("/tattoo/{name}/refresh", ArtistTattooRefresh).Methods("GET")
 	//router.HandleFunc("/tattoo/{id}", Tattoo).Methods("GET")
 	//router.HandleFunc("/tattoo/{id}.toml", TattooToml).Methods("GET")
 	router.HandleFunc("/tattoo/{id}", CreateTattoo).Methods("POST")
@@ -202,6 +204,11 @@ func main() {
 
 	router.HandleFunc("/piercing", Piercing).Methods("GET")
 	router.HandleFunc("/piercing/{id}", CreatePiercing).Methods("POST")
+
+	for _, t := range []string{"tattoo", "henna", "piercing", "design"} {
+		router.HandleFunc("/"+t+"/{name}", ArtistArtwork(t)).Methods("GET")
+		router.HandleFunc("/"+t+"/{name}/refresh", ArtistArtworkRefresh(t)).Methods("GET")
+	}
 
 	log.Fatal(http.ListenAndServe(":12345", router))
 }
