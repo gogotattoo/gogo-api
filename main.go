@@ -18,7 +18,7 @@ var hennas []models.Henna
 var piercing []models.Piercing
 var designs []models.Design
 
-var artistWorks = make(map[string][]interface{})
+var artistWorks = make(map[string]models.Artworks)
 
 // ArtistArtworkRefresh returns the list of all tattoos
 func ArtistArtworkRefresh(artType string) func(http.ResponseWriter, *http.Request) {

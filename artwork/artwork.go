@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
 
@@ -41,7 +42,7 @@ var myClient = &http.Client{Timeout: 100 * time.Second}
 
 // Refresh since we are currntly not using a database, instead all the artwork data is
 // on git services. Let's update our in memory database by utilizing github api.
-func Refresh(artistName, artType string) []interface{} {
+func Refresh(artistName, artType string) models.Artworks {
 	var files []file
 	url := fmt.Sprintf(gitURL, artistName, artType)
 	log.Println("Updating from " + url)
@@ -59,7 +60,7 @@ func Refresh(artistName, artType string) []interface{} {
 	if err != nil {
 		log.Panic(err)
 	}
-	var works []interface{}
+	var works models.Artworks
 	for i, f := range files {
 		//color.Green(":\t" + f.Name + "\t\t" + f.DownloadURL)
 		of, err := myClient.Get(f.DownloadURL)
@@ -73,5 +74,6 @@ func Refresh(artistName, artType string) []interface{} {
 		work.ID = strconv.Itoa(i)
 		works = append(works, work)
 	}
+	sort.Sort(works)
 	return works
 }
