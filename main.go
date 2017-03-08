@@ -37,18 +37,17 @@ func ArtistArtwork(artType string) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-var refreshLastCalled time.Time
+var refreshLastCalled time.Time = time.Now()
 
 // ArtistArtworkRefreshAll refreshes all known art types for given artistName
-// TODO: add a timer, allow only every 5-10 mins
-// TODO: put them in {"tattoo: {...}, design: {}, etc..."} json in the end and
-// create version only function
+// returns {"tattoo: {...}, design: {}, etc..."} json
 func ArtistArtworkRefreshAll(w http.ResponseWriter, r *http.Request) {
 	artistName := mux.Vars(r)["name"]
 	result := make(map[string]models.Artworks)
 	for _, artType := range []string{"tattoo", "henna", "piercing", "design"} {
-		//if (time.Now() > )
-		artistWorks[artistName+"/"+artType] = artwork.Refresh(artistName, artType)
+		if time.Now().After(refreshLastCalled.Add(time.Minute * 3)) {
+			artistWorks[artistName+"/"+artType] = artwork.Refresh(artistName, artType)
+		}
 		result[artType] = artistWorks[artistName+"/"+artType]
 	}
 	refreshLastCalled = time.Now()
@@ -231,5 +230,19 @@ func main() {
 
 	router.HandleFunc("/all/{name}/refresh", ArtistArtworkRefreshAll).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":12345", router))
+	for _, artistName := range []string{"gogo", "aid", "xizi"} {
+		for _, artType := range []string{"tattoo", "henna", "piercing", "design"} {
+			artistWorks[artistName+"/"+artType] = artwork.Refresh(artistName, artType)
+		}
+	}
+
+	log.Fatal(http.ListenAndServe(":12345", Log(router)))
+}
+
+// Log prints basic http request info
+func Log(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s %s", r.RemoteAddr, r.Method, r.URL)
+		handler.ServeHTTP(w, r)
+	})
 }

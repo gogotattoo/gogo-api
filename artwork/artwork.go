@@ -48,8 +48,10 @@ func Refresh(artistName, artType string) models.Artworks {
 	url := fmt.Sprintf(gitURL, artistName, artType)
 	log.Println("Updating from " + url)
 	of, err := myClient.Get(url)
+	var works models.Artworks = make(models.Artworks, 0)
 	if err != nil {
-		log.Panic(err)
+		log.Println(err)
+		return works
 	}
 	defer of.Body.Close()
 	// of, err := os.Open("gogo-2017-03-05-tattoo.json")
@@ -57,16 +59,18 @@ func Refresh(artistName, artType string) models.Artworks {
 	// 	log.Panic(err)
 	// }
 	// defer of.Close()
+
 	err = json.NewDecoder(of.Body).Decode(&files)
 	if err != nil {
-		log.Panic(err)
+		log.Println(err)
+		return works
 	}
-	var works models.Artworks
 	for i, f := range files {
 		//color.Green(":\t" + f.Name + "\t\t" + f.DownloadURL)
 		of, err := myClient.Get(f.DownloadURL)
 		if err != nil {
-			log.Panic(err)
+			log.Println(err)
+			continue
 		}
 		defer of.Body.Close()
 		tomlStr, _ := util.ExtractTomlStr(of.Body)
