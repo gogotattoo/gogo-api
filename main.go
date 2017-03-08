@@ -37,16 +37,22 @@ func ArtistArtwork(artType string) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
+var refreshLastCalled time.Time
+
 // ArtistArtworkRefreshAll refreshes all known art types for given artistName
 // TODO: add a timer, allow only every 5-10 mins
 // TODO: put them in {"tattoo: {...}, design: {}, etc..."} json in the end and
 // create version only function
 func ArtistArtworkRefreshAll(w http.ResponseWriter, r *http.Request) {
 	artistName := mux.Vars(r)["name"]
+	result := make(map[string]models.Artworks)
 	for _, artType := range []string{"tattoo", "henna", "piercing", "design"} {
+		//if (time.Now() > )
 		artistWorks[artistName+"/"+artType] = artwork.Refresh(artistName, artType)
-		json.NewEncoder(w).Encode(artistWorks[artistName+"/"+artType])
+		result[artType] = artistWorks[artistName+"/"+artType]
 	}
+	refreshLastCalled = time.Now()
+	json.NewEncoder(w).Encode(result)
 }
 
 // Tattoo shows info on a single tattoo work by id

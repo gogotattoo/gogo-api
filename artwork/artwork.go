@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/BurntSushi/toml"
@@ -72,6 +73,9 @@ func Refresh(artistName, artType string) models.Artworks {
 		var work models.Artwork
 		toml.Unmarshal([]byte(tomlStr), &work)
 		work.ID = strconv.Itoa(i)
+		spl := strings.Split(f.DownloadURL, "/")
+		fileName := spl[len(spl)-1]
+		work.Link = strings.Replace(fileName, ".md", "", -1)
 		works = append(works, work)
 	}
 	sort.Sort(works)
