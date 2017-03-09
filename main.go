@@ -37,7 +37,7 @@ func ArtistArtwork(artType string) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-var refreshLastCalled time.Time = time.Now()
+var refreshLastCalled = time.Now()
 
 // ArtistArtworkRefreshAll refreshes all known art types for given artistName
 // returns {"tattoo: {...}, design: {}, etc..."} json
@@ -68,18 +68,7 @@ func Tattoo(w http.ResponseWriter, req *http.Request) {
 
 // TattooToml shows info of a single tattoo work by id in toml format
 func TattooToml(w http.ResponseWriter, req *http.Request) {
-	params := mux.Vars(req)
-	for _, item := range tattoos {
-		if item.ID == params["id"] {
-			//fmt.Fprint(w, toml.En)
-			er := toml.NewEncoder(w).Encode(item)
-			if er != nil {
-				log.Println(er)
-			}
-			return
-		}
-	}
-	toml.NewEncoder(w).Encode(models.NewTattoo("", "brr", "", ""))
+	toml.NewEncoder(w).Encode(tattoos)
 }
 
 // Tattoos returns the list of all tattoos
@@ -210,7 +199,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/tattoo", Tattoos).Methods("GET")
 	//router.HandleFunc("/tattoo/{id}", Tattoo).Methods("GET")
-	//router.HandleFunc("/tattoo/{id}.toml", TattooToml).Methods("GET")
+	router.HandleFunc("/tattoo.toml", TattooToml).Methods("GET")
 	router.HandleFunc("/tattoo/{id}", CreateTattoo).Methods("POST")
 	router.HandleFunc("/tattoo/{id}", DeleteTattoo).Methods("DELETE")
 
