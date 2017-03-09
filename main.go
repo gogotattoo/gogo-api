@@ -68,7 +68,7 @@ func Tattoo(w http.ResponseWriter, req *http.Request) {
 
 // TattooToml shows info of a single tattoo work by id in toml format
 func TattooToml(w http.ResponseWriter, req *http.Request) {
-	toml.NewEncoder(w).Encode(tattoos)
+	toml.NewEncoder(w).Encode(tattoos[len(tattoos)-1])
 }
 
 // Tattoos returns the list of all tattoos
