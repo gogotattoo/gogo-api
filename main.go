@@ -118,7 +118,8 @@ func main() {
 	router.HandleFunc("/piercing/{id}", CreatePiercing).Methods("POST")
 
 	router.HandleFunc("/upload", upload)
-	router.Handle("/uploaded/", http.StripPrefix("/uploaded/", http.FileServer(http.Dir("./upload"))))
+	//router.Handle("/uploaded/", http.StripPrefix("/uploaded/", http.FileServer(http.Dir("./upload/"))))
+	router.PathPrefix("/uploaded/").Handler(http.StripPrefix("/uploaded/", http.FileServer(http.Dir("upload/"))))
 
 	for _, t := range []string{"tattoo", "henna", "piercing", "design"} {
 		router.HandleFunc("/"+t+"/{name}", ArtistArtwork(t)).Methods("GET")
