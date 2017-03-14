@@ -1,13 +1,17 @@
 package main
 
 import (
+	"crypto/md5"
 	"encoding/json"
+	"fmt"
+	"html/template"
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
-	"github.com/BurntSushi/toml"
 	"github.com/gogotattoo/common/models"
 	"github.com/gogotattoo/gogo-api/artwork"
 	"github.com/gorilla/mux"
@@ -54,28 +58,6 @@ func ArtistArtworkRefreshAll(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-// Tattoo shows info on a single tattoo work by id
-func Tattoo(w http.ResponseWriter, req *http.Request) {
-	params := mux.Vars(req)
-	for _, item := range tattoos {
-		if item.ID == params["id"] {
-			json.NewEncoder(w).Encode(item)
-			return
-		}
-	}
-	json.NewEncoder(w).Encode(models.NewTattoo("", "brr", "", ""))
-}
-
-// TattooToml shows info of a single tattoo work by id in toml format
-func TattooToml(w http.ResponseWriter, req *http.Request) {
-	toml.NewEncoder(w).Encode(tattoos[len(tattoos)-1])
-}
-
-// Tattoos returns the list of all tattoos
-func Tattoos(w http.ResponseWriter, req *http.Request) {
-	json.NewEncoder(w).Encode(tattoos)
-}
-
 var myClient = &http.Client{Timeout: 100 * time.Second}
 
 func getJSON(url string, target interface{}) (io.ReadCloser, error) {
@@ -88,111 +70,34 @@ func getJSON(url string, target interface{}) (io.ReadCloser, error) {
 	return t, json.NewDecoder(r.Body).Decode(target)
 }
 
-// CreateTattoo adds a new tattoo to the memory
-func CreateTattoo(w http.ResponseWriter, req *http.Request) {
-	log.Println("POST /tattoo")
-	params := mux.Vars(req)
-	defer req.Body.Close()
-	var tat models.Tattoo
-	err := json.NewDecoder(req.Body).Decode(&tat)
-	log.Println("TITLE\n", tat.Title)
-	if err != nil {
-		log.Println("ERROR\n", err)
-		json.NewEncoder(w).Encode(err)
-		return
-	}
-	tat.ID = params["id"]
-	tattoos = append(tattoos, tat)
-	m, _ := json.Marshal(tat)
-	log.Println("TATTOO\n", string(m)+"\n")
-	json.NewEncoder(w).Encode(tat)
-}
+// upload logic
+func upload(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("method:", r.Method)
+	if r.Method == "GET" {
+		crutime := time.Now().Unix()
+		h := md5.New()
+		io.WriteString(h, strconv.FormatInt(crutime, 10))
+		token := fmt.Sprintf("%x", h.Sum(nil))
 
-// DeleteTattoo deletes a tattoo by id from the memory
-func DeleteTattoo(w http.ResponseWriter, req *http.Request) {
-	params := mux.Vars(req)
-	for index, item := range tattoos {
-		if item.ID == params["id"] {
-			tattoos = append(tattoos[:index], tattoos[index+1:]...)
-			break
+		t, _ := template.ParseFiles("template/upload.gtpl")
+		t.Execute(w, token)
+	} else {
+		r.ParseMultipartForm(32 << 20)
+		file, handler, err := r.FormFile("uploadfile")
+		if err != nil {
+			fmt.Println(err)
+			return
 		}
+		defer file.Close()
+		fmt.Fprintf(w, "%v", handler.Header)
+		f, err := os.OpenFile("./upload/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer f.Close()
+		io.Copy(f, file)
 	}
-	json.NewEncoder(w).Encode(tattoos)
-}
-
-// Hennas returns the list of all hennas
-func Hennas(w http.ResponseWriter, req *http.Request) {
-	json.NewEncoder(w).Encode(hennas)
-}
-
-// CreateHenna adds a new henna object
-func CreateHenna(w http.ResponseWriter, req *http.Request) {
-	log.Println("POST /henna")
-	params := mux.Vars(req)
-	defer req.Body.Close()
-	var hen models.Henna
-	err := json.NewDecoder(req.Body).Decode(&hen)
-	log.Println("TITLE\n", hen.Title)
-	if err != nil {
-		log.Println("ERROR\n", err)
-		json.NewEncoder(w).Encode(err)
-		return
-	}
-	hen.ID = params["id"]
-	hennas = append(hennas, hen)
-	m, _ := json.Marshal(hen)
-	log.Println("HENNA\n", string(m)+"\n")
-	json.NewEncoder(w).Encode(hen)
-}
-
-// CreateDesign adds a new design object
-func CreateDesign(w http.ResponseWriter, req *http.Request) {
-	log.Println("POST /design")
-	params := mux.Vars(req)
-	defer req.Body.Close()
-	var des models.Design
-	err := json.NewDecoder(req.Body).Decode(&des)
-	log.Println("TITLE\n", des.Title)
-	if err != nil {
-		log.Println("ERROR\n", err)
-		json.NewEncoder(w).Encode(err)
-		return
-	}
-	des.ID = params["id"]
-	designs = append(designs, des)
-	m, _ := json.Marshal(des)
-	log.Println("DESIGN\n", string(m)+"\n")
-	json.NewEncoder(w).Encode(des)
-}
-
-// Designs returns the list of all designs
-func Designs(w http.ResponseWriter, req *http.Request) {
-	json.NewEncoder(w).Encode(designs)
-}
-
-// CreatePiercing adds a new design artwork
-func CreatePiercing(w http.ResponseWriter, req *http.Request) {
-	log.Println("POST /piercing")
-	params := mux.Vars(req)
-	defer req.Body.Close()
-	var per models.Piercing
-	err := json.NewDecoder(req.Body).Decode(&per)
-	log.Println("TITLE\n", per.Title)
-	if err != nil {
-		log.Println("ERROR\n", err)
-		json.NewEncoder(w).Encode(err)
-		return
-	}
-	per.ID = params["id"]
-	piercing = append(piercing, per)
-	m, _ := json.Marshal(per)
-	log.Println("PIERCING\n", string(m)+"\n")
-	json.NewEncoder(w).Encode(per)
-}
-
-// Piercing returns the list of all piercing works
-func Piercing(w http.ResponseWriter, req *http.Request) {
-	json.NewEncoder(w).Encode(piercing)
 }
 
 func main() {
@@ -212,6 +117,8 @@ func main() {
 	router.HandleFunc("/piercing", Piercing).Methods("GET")
 	router.HandleFunc("/piercing/{id}", CreatePiercing).Methods("POST")
 
+	router.HandleFunc("/upload", upload)
+
 	for _, t := range []string{"tattoo", "henna", "piercing", "design"} {
 		router.HandleFunc("/"+t+"/{name}", ArtistArtwork(t)).Methods("GET")
 		router.HandleFunc("/"+t+"/{name}/refresh", ArtistArtworkRefresh(t)).Methods("GET")
@@ -219,11 +126,13 @@ func main() {
 
 	router.HandleFunc("/all/{name}/refresh", ArtistArtworkRefreshAll).Methods("GET")
 
-	for _, artistName := range []string{"gogo", "aid", "xizi"} {
-		for _, artType := range []string{"tattoo", "henna", "piercing", "design"} {
-			artistWorks[artistName+"/"+artType] = artwork.Refresh(artistName, artType)
+	go func() {
+		for _, artistName := range []string{"gogo", "aid", "xizi"} {
+			for _, artType := range []string{"tattoo", "henna", "piercing", "design"} {
+				artistWorks[artistName+"/"+artType] = artwork.Refresh(artistName, artType)
+			}
 		}
-	}
+	}()
 
 	log.Fatal(http.ListenAndServe(":12345", Log(router)))
 }
