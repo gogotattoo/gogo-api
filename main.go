@@ -74,17 +74,22 @@ func getJSON(url string, target interface{}) (io.ReadCloser, error) {
 
 // upload logic
 func upload(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("method:", r.Method)
 	if r.Method == "GET" {
 		crutime := time.Now().Unix()
 		h := md5.New()
 		io.WriteString(h, strconv.FormatInt(crutime, 10))
 		token := fmt.Sprintf("%x", h.Sum(nil))
-
+		type vars struct {
+			Token string
+			Date  string
+		}
 		t, _ := template.ParseFiles("template/upload.gtpl")
-		t.Execute(w, token)
+		t.Execute(w, vars{Token: token, Date: time.Now().Format("2006/01/02")})
 	} else {
 		r.ParseMultipartForm(32 << 20)
+		artistName := r.Form.Get("artist_name")
+		madeAt := r.Form.Get("made_at")
+		madeDate := r.Form.Get("made_date")
 		file, handler, err := r.FormFile("uploadfile")
 		if err != nil {
 			fmt.Println(err)
@@ -103,6 +108,9 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		watermark.NeedLabels = true
 		watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/gogo-watermark.png"
 		watermark.OutputDir = "./upload/"
+		watermark.LabelMadeBy = artistName
+		watermark.LabelMadeAt = madeAt
+		watermark.LabelDate = madeDate
 
 		hashes := cli.AddWatermarks("./upload/" + handler.Filename)
 
