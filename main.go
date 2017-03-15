@@ -105,6 +105,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		defer f.Close()
 		io.Copy(f, file)
 
+		// Initializing watermark maker. There definetely must be a better golang way for it
 		watermark.NeedLabels = true
 		watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/gogo-watermark.png"
 		watermark.OutputDir = "./upload/"
@@ -150,13 +151,13 @@ func main() {
 
 	router.HandleFunc("/all/{name}/refresh", ArtistArtworkRefreshAll).Methods("GET")
 
-	go func() {
-		for _, artistName := range []string{"gogo", "aid", "xizi"} {
-			for _, artType := range []string{"tattoo", "henna", "piercing", "design"} {
+	for _, artistName := range []string{"gogo", "aid", "xizi"} {
+		for _, artType := range []string{"tattoo", "henna", "piercing", "design"} {
+			go func() {
 				artistWorks[artistName+"/"+artType] = artwork.Refresh(artistName, artType)
-			}
+			}()
 		}
-	}()
+	}
 
 	log.Fatal(http.ListenAndServe(":12345", Log(router)))
 }
