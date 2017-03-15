@@ -14,6 +14,8 @@ import (
 
 	"github.com/gogotattoo/common/models"
 	"github.com/gogotattoo/gogo-api/artwork"
+	"github.com/gogotattoo/gogo-upload/cli"
+	"github.com/gogotattoo/gogo-upload/watermark"
 	"github.com/gorilla/mux"
 )
 
@@ -89,7 +91,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer file.Close()
-		fmt.Fprintf(w, "%v", handler.Header)
+		//fmt.Fprintf(w, "%v", handler.Header)
 		f, err := os.OpenFile("./upload/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
 			fmt.Println(err)
@@ -97,6 +99,18 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		}
 		defer f.Close()
 		io.Copy(f, file)
+
+		watermark.NeedLabels = true
+		watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/gogo-watermark.png"
+		watermark.OutputDir = "./upload/"
+
+		hashes := cli.AddWatermarks("./upload/" + handler.Filename)
+
+		if len(hashes) > 0 {
+			http.Redirect(w, r, "https://ipfs.io/ipfs/"+hashes[0], 301)
+		} else {
+			fmt.Fprintf(w, "Cannot get hash, try again.")
+		}
 	}
 }
 
@@ -118,7 +132,7 @@ func main() {
 	router.HandleFunc("/piercing/{id}", CreatePiercing).Methods("POST")
 
 	router.HandleFunc("/upload", upload)
-	//router.Handle("/uploaded/", http.StripPrefix("/uploaded/", http.FileServer(http.Dir("./upload/"))))
+	// router.Handle("/uploaded/", http.StripPrefix("/uploaded/", http.FileServer(http.Dir("./upload/"))))
 	router.PathPrefix("/uploaded/").Handler(http.StripPrefix("/uploaded/", http.FileServer(http.Dir("upload/"))))
 
 	for _, t := range []string{"tattoo", "henna", "piercing", "design"} {
