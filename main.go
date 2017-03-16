@@ -90,6 +90,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		artistName := r.Form.Get("artist_name")
 		madeAt := r.Form.Get("made_at")
 		madeDate := r.Form.Get("made_date")
+		token := r.Form.Get("token")
 		file, handler, err := r.FormFile("uploadfile")
 		if err != nil {
 			fmt.Println(err)
@@ -116,7 +117,11 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		hashes := cli.AddWatermarks("./upload/" + handler.Filename)
 
 		if len(hashes) > 0 {
-			http.Redirect(w, r, "https://ipfs.io/ipfs/"+hashes[0], 301)
+			if len(token) == 0 {
+				fmt.Fprintf(w, "Hash:"+hashes[0])
+			} else {
+				http.Redirect(w, r, "https://ipfs.io/ipfs/"+hashes[0], 301)
+			}
 		} else {
 			fmt.Fprintf(w, "Cannot get hash, try again.")
 		}
@@ -153,9 +158,9 @@ func main() {
 
 	for _, artistName := range []string{"gogo", "aid", "xizi"} {
 		for _, artType := range []string{"tattoo", "henna", "piercing", "design"} {
-			go func() {
+			go func(artistName, artType string) {
 				artistWorks[artistName+"/"+artType] = artwork.Refresh(artistName, artType)
-			}()
+			}(artistName, artType)
 		}
 	}
 
