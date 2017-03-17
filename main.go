@@ -118,7 +118,11 @@ func upload(w http.ResponseWriter, r *http.Request) {
 
 		if len(hashes) > 0 {
 			if len(token) == 0 {
-				fmt.Fprintf(w, "Hash:"+hashes[0])
+				type res struct {
+					URL  string
+					Hash string
+				}
+				json.NewEncoder(w).Encode(&res{URL: "https://ipfs.io/ipfs/" + hashes[0], Hash: hashes[0]})
 			} else {
 				http.Redirect(w, r, "https://ipfs.io/ipfs/"+hashes[0], 301)
 			}
