@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/BurntSushi/toml"
 	"github.com/gogotattoo/common/models"
 	"github.com/gorilla/mux"
 )
@@ -32,4 +33,9 @@ func CreateDesign(w http.ResponseWriter, req *http.Request) {
 // Designs returns the list of all designs
 func Designs(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(designs)
+}
+
+// DesignsToml shows info of a single design work by id in toml format
+func DesignsToml(w http.ResponseWriter, req *http.Request) {
+	toml.NewEncoder(w).Encode(designs[len(designs)-1])
 }

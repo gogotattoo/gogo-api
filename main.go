@@ -23,6 +23,7 @@ var tattoos []models.Tattoo
 var hennas []models.Henna
 var piercing []models.Piercing
 var designs []models.Design
+var locks []models.Dreadlocks
 
 var artistWorks = make(map[string]models.Artworks)
 
@@ -140,14 +141,21 @@ func main() {
 	router.HandleFunc("/tattoo/{id}", CreateTattoo).Methods("POST")
 	router.HandleFunc("/tattoo/{id}", DeleteTattoo).Methods("DELETE")
 
+	router.HandleFunc("/henna.toml", HennaToml).Methods("GET")
 	router.HandleFunc("/henna", Hennas).Methods("GET")
 	router.HandleFunc("/henna/{id}", CreateHenna).Methods("POST")
 
+	router.HandleFunc("/design.toml", DesignsToml).Methods("GET")
 	router.HandleFunc("/design", Designs).Methods("GET")
 	router.HandleFunc("/design/{id}", CreateDesign).Methods("POST")
 
+	router.HandleFunc("/piercing.toml", PiercingToml).Methods("GET")
 	router.HandleFunc("/piercing", Piercing).Methods("GET")
 	router.HandleFunc("/piercing/{id}", CreatePiercing).Methods("POST")
+
+	router.HandleFunc("/dreadlocks.toml", LocksToml).Methods("GET")
+	router.HandleFunc("/dreadlocks", Locks).Methods("GET")
+	router.HandleFunc("/dreadlocks/{id}", Lock).Methods("POST")
 
 	router.HandleFunc("/upload", upload)
 	// router.Handle("/uploaded/", http.StripPrefix("/uploaded/", http.FileServer(http.Dir("./upload/"))))

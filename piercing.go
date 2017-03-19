@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/BurntSushi/toml"
 	"github.com/gogotattoo/common/models"
 	"github.com/gorilla/mux"
 )
@@ -32,4 +33,9 @@ func CreatePiercing(w http.ResponseWriter, req *http.Request) {
 // Piercing returns the list of all piercing works
 func Piercing(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(piercing)
+}
+
+// PiercingToml shows info of a single piercing work by id in toml format
+func PiercingToml(w http.ResponseWriter, req *http.Request) {
+	toml.NewEncoder(w).Encode(piercing[len(piercing)-1])
 }

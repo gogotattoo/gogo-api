@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/BurntSushi/toml"
 	"github.com/gogotattoo/common/models"
 	"github.com/gorilla/mux"
 )
@@ -12,6 +13,11 @@ import (
 // Hennas returns the list of all hennas
 func Hennas(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(hennas)
+}
+
+// HennaToml shows info of a single henna work by id in toml format
+func HennaToml(w http.ResponseWriter, req *http.Request) {
+	toml.NewEncoder(w).Encode(hennas[len(hennas)-1])
 }
 
 // CreateHenna adds a new henna object
