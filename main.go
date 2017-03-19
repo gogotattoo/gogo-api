@@ -168,11 +168,15 @@ func main() {
 
 	router.HandleFunc("/all/{name}/refresh", ArtistArtworkRefreshAll).Methods("GET")
 
-	for _, artistName := range []string{"gogo", "aid", "xizi"} {
-		for _, artType := range []string{"tattoo", "henna", "piercing", "design"} {
-			go func(artistName, artType string) {
-				artistWorks[artistName+"/"+artType] = artwork.Refresh(artistName, artType)
-			}(artistName, artType)
+	artists := make(models.Artists, 3)
+	artists[0] = models.Artist{Name: "gogo", Services: []string{"tattoo", "henna", "piercing", "design", "dreadlocks"}}
+	artists[1] = models.Artist{Name: "aid", Services: []string{"tattoo"}}
+	artists[2] = models.Artist{Name: "xizi", Services: []string{"tattoo", "design"}}
+	for _, artist := range artists {
+		for _, service := range artist.Services {
+			go func(name, service string) {
+				artistWorks[name+"/"+service] = artwork.Refresh(name, service)
+			}(artist.Name, service)
 		}
 	}
 
