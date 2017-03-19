@@ -109,11 +109,19 @@ func upload(w http.ResponseWriter, r *http.Request) {
 
 		// Initializing watermark maker. There definetely must be a better golang way for it
 		watermark.NeedLabels = true
-		watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/gogo-watermark.png"
 		watermark.OutputDir = "./upload/"
 		watermark.LabelMadeBy = artistName
 		watermark.LabelMadeAt = madeAt
 		watermark.LabelDate = madeDate
+
+		// It's a bit dirty, but will work for now
+		// by default, it's gogo's work
+		watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/gogo-watermark.png"
+		if artistName == "aid" {
+			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/aidlong.png"
+		} else if artistName == "xizi" {
+			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/xizilong.png"
+		}
 
 		hashes := cli.AddWatermarks("./upload/" + handler.Filename)
 
