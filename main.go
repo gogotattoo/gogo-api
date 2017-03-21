@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gogotattoo/common/models"
@@ -99,7 +100,9 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		}
 		defer file.Close()
 		//fmt.Fprintf(w, "%v", handler.Header)
-		f, err := os.OpenFile("./upload/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		dirName := "./upload/" + strings.Replace(time.Now().Format("2006/01/02"), "/", "_", -1) + "/"
+		os.MkdirAll(dirName, os.ModePerm)
+		f, err := os.OpenFile(dirName+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -109,7 +112,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 
 		// Initializing watermark maker. There definetely must be a better golang way for it
 		watermark.NeedLabels = true
-		watermark.OutputDir = "./upload/"
+		watermark.OutputDir = dirName
 		watermark.LabelMadeBy = artistName
 		watermark.LabelMadeAt = madeAt
 		watermark.LabelDate = madeDate
@@ -123,7 +126,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/xizilong.png"
 		}
 
-		hashes := cli.AddWatermarks("./upload/" + handler.Filename)
+		hashes := cli.AddWatermarks(dirName + handler.Filename)
 
 		if len(hashes) > 0 {
 			if len(token) == 0 {
