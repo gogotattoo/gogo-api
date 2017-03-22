@@ -166,13 +166,13 @@ func main() {
 
 	router.HandleFunc("/dreadlocks.toml", LocksToml).Methods("GET")
 	router.HandleFunc("/dreadlocks", Locks).Methods("GET")
-	router.HandleFunc("/dreadlocks/{id}", Lock).Methods("POST")
+	router.HandleFunc("/dreadlocks/{id}", CreateDreadlocks).Methods("POST")
 
 	router.HandleFunc("/upload", upload)
 	// router.Handle("/uploaded/", http.StripPrefix("/uploaded/", http.FileServer(http.Dir("./upload/"))))
 	router.PathPrefix("/uploaded/").Handler(http.StripPrefix("/uploaded/", http.FileServer(http.Dir("upload/"))))
 
-	for _, t := range []string{"tattoo", "henna", "piercing", "design"} {
+	for _, t := range []string{"tattoo", "henna", "piercing", "design", "dreadlocks"} {
 		router.HandleFunc("/"+t+"/{name}", ArtistArtwork(t)).Methods("GET")
 		router.HandleFunc("/"+t+"/{name}/refresh", ArtistArtworkRefresh(t)).Methods("GET")
 	}
