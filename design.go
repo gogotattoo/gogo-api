@@ -39,3 +39,15 @@ func Designs(w http.ResponseWriter, req *http.Request) {
 func DesignsToml(w http.ResponseWriter, req *http.Request) {
 	toml.NewEncoder(w).Encode(designs[len(designs)-1])
 }
+
+// DeleteDesign deletes a design by id from the posted works in memory
+func DeleteDesign(w http.ResponseWriter, req *http.Request) {
+	params := mux.Vars(req)
+	for index, item := range designs {
+		if item.ID == params["id"] {
+			designs = append(designs[:index], designs[index+1:]...)
+			break
+		}
+	}
+	json.NewEncoder(w).Encode(designs)
+}

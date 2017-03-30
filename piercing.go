@@ -39,3 +39,15 @@ func Piercing(w http.ResponseWriter, req *http.Request) {
 func PiercingToml(w http.ResponseWriter, req *http.Request) {
 	toml.NewEncoder(w).Encode(piercing[len(piercing)-1])
 }
+
+// DeletePiercing deletes a piercing by id from the posted works in memory
+func DeletePiercing(w http.ResponseWriter, req *http.Request) {
+	params := mux.Vars(req)
+	for index, item := range piercing {
+		if item.ID == params["id"] {
+			piercing = append(piercing[:index], piercing[index+1:]...)
+			break
+		}
+	}
+	json.NewEncoder(w).Encode(piercing)
+}

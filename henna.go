@@ -39,3 +39,15 @@ func CreateHenna(w http.ResponseWriter, req *http.Request) {
 	log.Println("HENNA\n", string(m)+"\n")
 	json.NewEncoder(w).Encode(hen)
 }
+
+// DeleteHenna deletes a henna by id from the posted works in memory
+func DeleteHenna(w http.ResponseWriter, req *http.Request) {
+	params := mux.Vars(req)
+	for index, item := range hennas {
+		if item.ID == params["id"] {
+			hennas = append(hennas[:index], hennas[index+1:]...)
+			break
+		}
+	}
+	json.NewEncoder(w).Encode(hennas)
+}
