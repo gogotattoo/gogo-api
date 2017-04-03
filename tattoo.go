@@ -4,11 +4,14 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/gogotattoo/common/models"
 	"github.com/gorilla/mux"
 )
+
+var artistTattoos = make(map[string]models.Tattoo)
 
 // Tattoo shows info on a single tattoo work by id
 func Tattoo(w http.ResponseWriter, req *http.Request) {
@@ -29,6 +32,15 @@ func TattooToml(w http.ResponseWriter, req *http.Request) {
 
 // Tattoos returns the list of all tattoos
 func Tattoos(w http.ResponseWriter, req *http.Request) {
+	params := mux.Vars(req)
+	if len(params["artist"]) > 0 {
+		if len(req.URL.Query().Get("status")) > 0 {
+			renderTattoos(w, params["artist"], req.URL.Query().Get("status"))
+		} else {
+			json.NewEncoder(w).Encode(artistWorks[params["artist"]+"/tattoo"])
+		}
+		return
+	}
 	json.NewEncoder(w).Encode(tattoos)
 }
 
@@ -46,15 +58,36 @@ func CreateTattoo(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	tat.ID = params["id"]
-	tattoos = append(tattoos, tat)
+
+	if len(params["artist"]) > 0 {
+		artistTattoos[params["artist"]+"/tattoo/"+params["work_name"]+"?status=wip"] = tat
+		//renderTattoos(w, params["artist"], "wip")
+	} else {
+		tattoos = append(tattoos, tat)
+	}
 	m, _ := json.Marshal(tat)
 	log.Println("TATTOO\n", string(m)+"\n")
 	json.NewEncoder(w).Encode(tat)
 }
 
+func renderTattoos(w http.ResponseWriter, artistName, status string) {
+	tts := make([]models.Tattoo, 0, 100)
+	for key, tat := range artistTattoos {
+		if strings.Contains(key, artistName) {
+			tts = append(tts, tat)
+		}
+	}
+	json.NewEncoder(w).Encode(tts)
+}
+
 // DeleteTattoo deletes a tattoo by id from the memory
 func DeleteTattoo(w http.ResponseWriter, req *http.Request) {
 	params := mux.Vars(req)
+	if len(params["artist"]) > 0 {
+		delete(artistTattoos, params["artist"]+"/tattoo/"+params["work_name"]+"?status=wip")
+		renderTattoos(w, params["artist"], "wip")
+		return
+	}
 	for index, item := range tattoos {
 		if item.ID == params["id"] {
 			tattoos = append(tattoos[:index], tattoos[index+1:]...)

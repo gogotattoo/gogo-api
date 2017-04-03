@@ -52,7 +52,7 @@ var refreshLastCalled = time.Now()
 func ArtistArtworkRefreshAll(w http.ResponseWriter, r *http.Request) {
 	artistName := mux.Vars(r)["name"]
 	result := make(map[string]models.Artworks)
-	for _, artType := range []string{"tattoo", "henna", "piercing", "design"} {
+	for _, artType := range []string{"tattoo", "henna", "piercing", "design", "dreadlocks", "art", "food"} {
 		if time.Now().After(refreshLastCalled.Add(time.Minute * 3)) {
 			artistWorks[artistName+"/"+artType] = artwork.Refresh(artistName, artType)
 		}
@@ -157,7 +157,7 @@ func main() {
 	artists := make(models.Artists, 3)
 	artists[0] = models.Artist{Name: "gogo", Services: []string{"tattoo", "henna", "piercing", "design", "dreadlocks"}}
 	artists[1] = models.Artist{Name: "aid", Services: []string{"tattoo"}}
-	artists[2] = models.Artist{Name: "xizi", Services: []string{"tattoo", "design"}}
+	artists[2] = models.Artist{Name: "xizi", Services: []string{"tattoo", "design", "henna", "piercing"}}
 	for _, artist := range artists {
 		for _, service := range artist.Services {
 			go func(name, service string) {
@@ -166,7 +166,7 @@ func main() {
 		}
 	}
 
-	log.Fatal(http.ListenAndServe(":12345", Log(router)))
+	log.Fatal(http.ListenAndServe(":12346", Log(router)))
 }
 
 // Log prints basic http request info
