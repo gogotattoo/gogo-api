@@ -166,7 +166,7 @@ func main() {
 		}
 	}
 
-	log.Fatal(http.ListenAndServe(":12346", Log(router)))
+	log.Fatal(http.ListenAndServe(":12345", Log(router)))
 }
 
 // Log prints basic http request info
