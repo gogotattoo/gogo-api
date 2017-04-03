@@ -11,8 +11,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var artistTattoos = make(map[string]models.Tattoo)
-
 // Tattoo shows info on a single tattoo work by id
 func Tattoo(w http.ResponseWriter, req *http.Request) {
 	params := mux.Vars(req)
@@ -61,7 +59,6 @@ func CreateTattoo(w http.ResponseWriter, req *http.Request) {
 
 	if len(params["artist"]) > 0 {
 		artistTattoos[params["artist"]+"/tattoo/"+params["work_name"]+"?status=wip"] = tat
-		//renderTattoos(w, params["artist"], "wip")
 	} else {
 		tattoos = append(tattoos, tat)
 	}
@@ -69,6 +66,8 @@ func CreateTattoo(w http.ResponseWriter, req *http.Request) {
 	log.Println("TATTOO\n", string(m)+"\n")
 	json.NewEncoder(w).Encode(tat)
 }
+
+var artistTattoos = make(map[string]models.Tattoo)
 
 func renderTattoos(w http.ResponseWriter, artistName, status string) {
 	tts := make([]models.Tattoo, 0, 100)

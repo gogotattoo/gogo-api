@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/gogotattoo/common/models"
@@ -29,6 +30,15 @@ func LocksToml(w http.ResponseWriter, req *http.Request) {
 
 // Locks returns the list of all dreadlocks
 func Locks(w http.ResponseWriter, req *http.Request) {
+	params := mux.Vars(req)
+	if len(params["artist"]) > 0 {
+		if len(req.URL.Query().Get("status")) > 0 {
+			renderDreadlocks(w, params["artist"], req.URL.Query().Get("status"))
+		} else {
+			json.NewEncoder(w).Encode(artistWorks[params["artist"]+"/dreadlocks"])
+		}
+		return
+	}
 	json.NewEncoder(w).Encode(locks)
 }
 
@@ -45,7 +55,12 @@ func CreateDreadlocks(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	tat.ID = params["id"]
-	locks = append(locks, tat)
+
+	if len(params["artist"]) > 0 {
+		artistDreadlocks[params["artist"]+"/dreadlocks/"+params["work_name"]+"?status=wip"] = tat
+	} else {
+		locks = append(locks, tat)
+	}
 	m, _ := json.Marshal(tat)
 	log.Println("TATTOO\n", string(m)+"\n")
 	json.NewEncoder(w).Encode(tat)
@@ -54,6 +69,11 @@ func CreateDreadlocks(w http.ResponseWriter, req *http.Request) {
 // DeleteDreadlocks deletes a work by id from the memory
 func DeleteDreadlocks(w http.ResponseWriter, req *http.Request) {
 	params := mux.Vars(req)
+	if len(params["artist"]) > 0 {
+		delete(artistDreadlocks, params["artist"]+"/dreadlocks/"+params["work_name"]+"?status=wip")
+		renderDreadlocks(w, params["artist"], "wip")
+		return
+	}
 	for index, item := range locks {
 		if item.ID == params["id"] {
 			locks = append(locks[:index], locks[index+1:]...)
@@ -61,4 +81,16 @@ func DeleteDreadlocks(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 	json.NewEncoder(w).Encode(locks)
+}
+
+var artistDreadlocks = make(map[string]models.Dreadlocks)
+
+func renderDreadlocks(w http.ResponseWriter, artistName, status string) {
+	drrlkts := make([]models.Dreadlocks, 0, 100)
+	for key, dr := range artistDreadlocks {
+		if strings.Contains(key, artistName) {
+			drrlkts = append(drrlkts, dr)
+		}
+	}
+	json.NewEncoder(w).Encode(drrlkts)
 }
