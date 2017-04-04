@@ -132,6 +132,8 @@ func upload(w http.ResponseWriter, r *http.Request) {
 			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/aid-label-v2.png"
 		} else if artistName == "xizi" {
 			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/xizi-label-v2.png"
+		} else if artistName == "kate" {
+			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/kate-label-v2.png"
 		}
 		hashes := cli.AddWatermarks(dirName + handler.Filename)
 
