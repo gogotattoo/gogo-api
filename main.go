@@ -156,10 +156,11 @@ func upload(w http.ResponseWriter, r *http.Request) {
 func main() {
 	router := NewRouter()
 
-	artists := make(models.Artists, 3)
+	artists := make(models.Artists, 4)
 	artists[0] = models.Artist{Name: "gogo", Services: []string{"tattoo", "henna", "piercing", "design", "dreadlocks"}}
 	artists[1] = models.Artist{Name: "aid", Services: []string{"tattoo"}}
 	artists[2] = models.Artist{Name: "xizi", Services: []string{"tattoo", "design", "henna", "piercing"}}
+	artists[3] = models.Artist{Name: "kate", Services: []string{"tattoo", "design"}}
 	for _, artist := range artists {
 		for _, service := range artist.Services {
 			go func(name, service string) {
