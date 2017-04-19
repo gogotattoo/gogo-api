@@ -90,4 +90,6 @@ func injectRoutes(router *mux.Router) {
 
 	router.HandleFunc("/{name}/all/refresh", ArtistArtworkRefreshAll).Methods("GET")
 
+	router.HandleFunc("/artists", Artists).Methods("GET")
+
 }
