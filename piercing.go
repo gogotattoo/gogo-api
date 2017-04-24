@@ -44,14 +44,21 @@ func Piercing(w http.ResponseWriter, req *http.Request) {
 		} else {
 			json.NewEncoder(w).Encode(artistWorks[params["artist"]+"/piercing"])
 		}
-		return
 	}
-	json.NewEncoder(w).Encode(piercing)
 }
 
 // PiercingToml shows info of a single piercing work by id in toml format
 func PiercingToml(w http.ResponseWriter, req *http.Request) {
-	toml.NewEncoder(w).Encode(piercing[len(piercing)-1])
+	params := mux.Vars(req)
+	if len(params["artist"]) > 0 {
+		if len(req.URL.Query().Get("status")) > 0 {
+			renderPiercingToml(w, params["artist"], req.URL.Query().Get("status"))
+		} else {
+			for _, tat := range artistWorks[params["artist"]+"/piercing"] {
+				toml.NewEncoder(w).Encode(tat)
+			}
+		}
+	}
 }
 
 // DeletePiercing deletes a piercing by id from the posted works in memory
@@ -81,4 +88,16 @@ func renderPiercing(w http.ResponseWriter, artistName, status string) {
 		}
 	}
 	json.NewEncoder(w).Encode(prsngs)
+}
+
+func renderPiercingToml(w http.ResponseWriter, artistName, status string) {
+	prsngs := make([]models.Piercing, 0, 100)
+	for key, pier := range artistPiercing {
+		if strings.Contains(key, artistName) {
+			prsngs = append(prsngs, pier)
+		}
+	}
+	for _, p := range prsngs {
+		toml.NewEncoder(w).Encode(p)
+	}
 }

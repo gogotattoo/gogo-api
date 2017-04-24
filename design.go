@@ -45,14 +45,21 @@ func Designs(w http.ResponseWriter, req *http.Request) {
 		} else {
 			json.NewEncoder(w).Encode(artistWorks[params["artist"]+"/design"])
 		}
-		return
 	}
-	json.NewEncoder(w).Encode(designs)
 }
 
 // DesignsToml shows info of a single design work by id in toml format
 func DesignsToml(w http.ResponseWriter, req *http.Request) {
-	toml.NewEncoder(w).Encode(designs[len(designs)-1])
+	params := mux.Vars(req)
+	if len(params["artist"]) > 0 {
+		if len(req.URL.Query().Get("status")) > 0 {
+			renderDesignsToml(w, params["artist"], req.URL.Query().Get("status"))
+		} else {
+			for _, d := range artistWorks[params["artist"]+"/design"] {
+				toml.NewEncoder(w).Encode(d)
+			}
+		}
+	}
 }
 
 // DeleteDesign deletes a design by id from the posted works in memory
@@ -82,4 +89,16 @@ func renderDesigns(w http.ResponseWriter, artistName, status string) {
 		}
 	}
 	json.NewEncoder(w).Encode(dsgns)
+}
+
+func renderDesignsToml(w http.ResponseWriter, artistName, status string) {
+	dsgns := make([]models.Design, 0, 100)
+	for key, des := range artistDesigns {
+		if strings.Contains(key, artistName) {
+			dsgns = append(dsgns, des)
+		}
+	}
+	for _, d := range dsgns {
+		toml.NewEncoder(w).Encode(d)
+	}
 }

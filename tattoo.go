@@ -33,11 +33,8 @@ func TattooToml(w http.ResponseWriter, req *http.Request) {
 			for _, tat := range artistWorks[params["artist"]+"/tattoo"] {
 				toml.NewEncoder(w).Encode(tat)
 			}
-
 		}
-		return
 	}
-	toml.NewEncoder(w).Encode(tattoos)
 }
 
 // Tattoos returns the list of all tattoos

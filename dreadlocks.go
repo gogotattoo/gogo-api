@@ -25,7 +25,16 @@ func Lock(w http.ResponseWriter, req *http.Request) {
 
 // LocksToml shows info of a single work by id in toml format
 func LocksToml(w http.ResponseWriter, req *http.Request) {
-	toml.NewEncoder(w).Encode(locks[len(locks)-1])
+	params := mux.Vars(req)
+	if len(params["artist"]) > 0 {
+		if len(req.URL.Query().Get("status")) > 0 {
+			renderDreadlocksToml(w, params["artist"], req.URL.Query().Get("status"))
+		} else {
+			for _, dr := range artistWorks[params["artist"]+"/dreadlocks"] {
+				toml.NewEncoder(w).Encode(dr)
+			}
+		}
+	}
 }
 
 // Locks returns the list of all dreadlocks
@@ -37,9 +46,7 @@ func Locks(w http.ResponseWriter, req *http.Request) {
 		} else {
 			json.NewEncoder(w).Encode(artistWorks[params["artist"]+"/dreadlocks"])
 		}
-		return
 	}
-	json.NewEncoder(w).Encode(locks)
 }
 
 // CreateDreadlocks adds a new work to the memory
@@ -93,4 +100,16 @@ func renderDreadlocks(w http.ResponseWriter, artistName, status string) {
 		}
 	}
 	json.NewEncoder(w).Encode(drrlkts)
+}
+
+func renderDreadlocksToml(w http.ResponseWriter, artistName, status string) {
+	drrlkts := make([]models.Dreadlocks, 0, 100)
+	for key, dr := range artistDreadlocks {
+		if strings.Contains(key, artistName) {
+			drrlkts = append(drrlkts, dr)
+		}
+	}
+	for _, d := range drrlkts {
+		toml.NewEncoder(w).Encode(d)
+	}
 }
