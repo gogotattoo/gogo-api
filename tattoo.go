@@ -25,7 +25,19 @@ func Tattoo(w http.ResponseWriter, req *http.Request) {
 
 // TattooToml shows info of a single tattoo work by id in toml format
 func TattooToml(w http.ResponseWriter, req *http.Request) {
-	toml.NewEncoder(w).Encode(tattoos[len(tattoos)-1])
+	params := mux.Vars(req)
+	if len(params["artist"]) > 0 {
+		if len(req.URL.Query().Get("status")) > 0 {
+			renderTattoosToml(w, params["artist"], req.URL.Query().Get("status"))
+		} else {
+			for _, tat := range artistWorks[params["artist"]+"/tattoo"] {
+				toml.NewEncoder(w).Encode(tat)
+			}
+
+		}
+		return
+	}
+	toml.NewEncoder(w).Encode(tattoos)
 }
 
 // Tattoos returns the list of all tattoos
@@ -77,6 +89,18 @@ func renderTattoos(w http.ResponseWriter, artistName, status string) {
 		}
 	}
 	json.NewEncoder(w).Encode(tts)
+}
+func renderTattoosToml(w http.ResponseWriter, artistName, status string) {
+	tts := make([]models.Tattoo, 0, 100)
+	for key, tat := range artistTattoos {
+		if strings.Contains(key, artistName) {
+			tts = append(tts, tat)
+		}
+	}
+
+	for _, tat := range tts {
+		toml.NewEncoder(w).Encode(tat)
+	}
 }
 
 // DeleteTattoo deletes a tattoo by id from the memory
