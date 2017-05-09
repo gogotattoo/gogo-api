@@ -8,7 +8,7 @@ import (
 )
 
 func Artists(w http.ResponseWriter, r *http.Request) {
-	artists := make(models.Artists, 4)
+	artists := make(models.Artists, 5)
 	artists[0] = models.Artist{Link: "gogo", Name: "Яна Gogo",
 		Services:   []string{"tattoo", "henna", "piercing", "design", "dreadlocks"},
 		AvatarIpfs: "QmasSfXhWZgB1BT7Ytn7SCxxxnpZcMXofr2m93LpGTDGHh"}
@@ -21,5 +21,11 @@ func Artists(w http.ResponseWriter, r *http.Request) {
 	artists[3] = models.Artist{Link: "kate", Name: "Екатерина",
 		Services:   []string{"tattoo", "henna", "design"},
 		AvatarIpfs: "QmXRBH18LTZx3G29BtVVee266hPn1swherCYJ4Gz8oR5iN"}
+	artists[4] = models.Artist{Link: "klimin", Name: "Vitaly Klimin",
+		Services:   []string{"tattoo", "design"},
+		AvatarIpfs: "QmThwsgPBLiPR33NU4toa2zE6ABAv2w2M6DK6fWTbQyN6b"}
+	artists[5] = models.Artist{Link: "jiaye", Name: "Jia Ye",
+		Services:   []string{"tattoo", "design"},
+		AvatarIpfs: ""}
 	json.NewEncoder(w).Encode(artists)
 }
