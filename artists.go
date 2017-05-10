@@ -8,7 +8,7 @@ import (
 )
 
 func Artists(w http.ResponseWriter, r *http.Request) {
-	artists := make(models.Artists, 5)
+	artists := make(models.Artists, 6)
 	artists[0] = models.Artist{Link: "gogo", Name: "Яна Gogo",
 		Services:   []string{"tattoo", "henna", "piercing", "design", "dreadlocks"},
 		AvatarIpfs: "QmasSfXhWZgB1BT7Ytn7SCxxxnpZcMXofr2m93LpGTDGHh"}
