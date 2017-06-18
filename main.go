@@ -117,35 +117,18 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		watermark.LabelMadeAt = madeAt
 		watermark.LabelDate = madeDate
 
-		// It's a bit dirty, but will work for now
-		// by default, it's gogo's work
-		watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/gogo-watermark.png"
+		watermark.V3 = true
+		watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/v3/gogo.png"
 		if artistName == "aid" {
-			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/aidlong.png"
+			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/v3/aid.png"
 		} else if artistName == "xizi" {
-			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/xizilong.png"
-		} else if artistName == "klimin" {
-			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/klimin-watermark.png"
-		} else if artistName == "jiaye" {
-			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/jiaye-watermark.png"
-		}
-
-		watermark.V2 = true
-		watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/gogo-label-v2.png"
-		if artistName == "aid" {
-			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/aid-label-v2.png"
-		} else if artistName == "xizi" {
-			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/xizi-label-v2.png"
+			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/v3/xizi.png"
 		} else if artistName == "kate" {
-			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/kate-label-v2.png"
-		}
-
-		if artistName == "klimin" {
-			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/klimin-watermark.png"
-			watermark.V2 = false
+			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/v3/kate.png"
+		} else if artistName == "klimin" {
+			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/v3/klimin.png"
 		} else if artistName == "jiaye" {
-			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/jiaye-watermark.png"
-			watermark.V2 = false
+			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/v3/jiaye.png"
 		}
 		hashes := cli.AddWatermarks(dirName + handler.Filename)
 
