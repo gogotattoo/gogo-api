@@ -24,8 +24,8 @@ func Artists(w http.ResponseWriter, r *http.Request) {
 	artists[4] = models.Artist{Link: "klimin", Name: "Vitaly Klimin",
 		Services:   []string{"tattoo", "design"},
 		AvatarIpfs: "QmThwsgPBLiPR33NU4toa2zE6ABAv2w2M6DK6fWTbQyN6b"}
-	artists[5] = models.Artist{Link: "jiaye", Name: "Jia Ye",
+	artists[5] = models.Artist{Link: "zhenfeng", Name: "Zhen Feng",
 		Services:   []string{"tattoo", "design"},
-		AvatarIpfs: ""}
+		AvatarIpfs: "QmNgPsW45oBis7BxL1GKoRYQC6a866kearbHLTKBSyyrGr"}
 	json.NewEncoder(w).Encode(artists)
 }

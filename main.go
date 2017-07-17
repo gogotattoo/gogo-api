@@ -127,8 +127,8 @@ func upload(w http.ResponseWriter, r *http.Request) {
 			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/v3/kate.png"
 		} else if artistName == "klimin" {
 			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/v3/klimin.png"
-		} else if artistName == "jiaye" {
-			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/v3/jiaye.png"
+		} else if artistName == "zhenfeng" {
+			watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/v3/zhenfeng.png"
 		}
 		hashes := cli.AddWatermarks(dirName + handler.Filename)
 
@@ -157,7 +157,7 @@ func main() {
 	artists[2] = models.Artist{Name: "xizi", Services: []string{"tattoo", "design", "henna", "piercing"}}
 	artists[3] = models.Artist{Name: "kate", Services: []string{"tattoo", "design"}}
 	artists[4] = models.Artist{Name: "klimin", Services: []string{"tattoo", "design"}}
-	artists[5] = models.Artist{Name: "jiaye", Services: []string{"tattoo", "design"}}
+	artists[5] = models.Artist{Name: "zhenfeng", Services: []string{"tattoo", "design"}}
 	for _, artist := range artists {
 		for _, service := range artist.Services {
 			go func(name, service string) {
