@@ -176,7 +176,9 @@ func main() {
 		CurrentStudio: "chushangfeng",
 		Services:      []string{"tattoo", "design"}}
 	artists[7] = models.Artist{Name: "gabchik",
-		Services: []string{"tattoo", "design"}}
+		LocationNow:   "Shanghai, China",
+		CurrentStudio: "chushangfeng",
+		Services:      []string{"tattoo", "design"}}
 	for _, artist := range artists {
 		for _, service := range artist.Services {
 			go func(name, service string) {

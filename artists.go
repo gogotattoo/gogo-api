@@ -30,7 +30,7 @@ func Artists(w http.ResponseWriter, r *http.Request) {
 	artists[6] = models.Artist{Link: "s-o", Name: "stpd",
 		Services:   []string{"tattoo", "design"},
 		AvatarIpfs: "Qmdyoyf2qmDJ3BqU9iSkpmQejCjq4iCWNwCo8K7TcvhW5K"}
-	artists[7] = models.Artist{Link: "gabchik", Name: "Zhen Feng",
+	artists[7] = models.Artist{Link: "gabchik", Name: "Gabchik",
 		Services:   []string{"tattoo", "design"},
 		AvatarIpfs: "QmdKqJUMhdwkuQptBBGX8WxDtTvzUFR6VmSkptrWHP1FvT"}
 	json.NewEncoder(w).Encode(artists)
