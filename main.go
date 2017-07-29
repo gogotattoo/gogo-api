@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -77,9 +76,8 @@ func getJSON(url string, target interface{}) (io.ReadCloser, error) {
 // upload logic
 func upload(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		crutime := time.Now().Unix()
 		h := md5.New()
-		io.WriteString(h, strconv.FormatInt(crutime, 10))
+		// io.WriteString(h, strconv.FormatInt(crutime, 10))
 		token := fmt.Sprintf("%x", h.Sum(nil))
 		type vars struct {
 			Token string
@@ -117,9 +115,18 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		watermark.LabelMadeAt = madeAt
 		watermark.LabelDate = madeDate
 
-		watermark.V3 = true
-		watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/v3/" + artistName + ".png"
+		watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/"
 
+		if artistName == "zhenfeng" || artistName == "gabchik" || artistName == "xizi" {
+			watermark.V4 = true
+			watermark.V3 = false
+			watermark.WatermarkPath += "v4/"
+		} else {
+			watermark.V3 = true
+			watermark.V4 = false
+			watermark.WatermarkPath += "v3/"
+		}
+		watermark.WatermarkPath += artistName + ".png"
 		hashes := cli.AddWatermarks(dirName + handler.Filename)
 
 		if len(hashes) > 0 {
@@ -141,13 +148,35 @@ func upload(w http.ResponseWriter, r *http.Request) {
 func main() {
 	router := NewRouter()
 
-	artists := make(models.Artists, 6)
-	artists[0] = models.Artist{Name: "gogo", Services: []string{"tattoo", "henna", "piercing", "design", "dreadlocks"}}
-	artists[1] = models.Artist{Name: "aid", Services: []string{"tattoo"}}
-	artists[2] = models.Artist{Name: "xizi", Services: []string{"tattoo", "design", "henna", "piercing"}}
-	artists[3] = models.Artist{Name: "kate", Services: []string{"tattoo", "design"}}
-	artists[4] = models.Artist{Name: "klimin", Services: []string{"tattoo", "design"}}
-	artists[5] = models.Artist{Name: "zhenfeng", Services: []string{"tattoo", "design"}}
+	artists := make(models.Artists, 8)
+	artists[0] = models.Artist{Name: "gogo",
+		LocationNow:   "Shanghai, China",
+		CurrentStudio: "chushangfeng",
+		Services:      []string{"tattoo", "henna", "piercing", "design", "dreadlocks"}}
+	artists[1] = models.Artist{Name: "aid",
+		LocationNow:   "Gatchina, Russia",
+		CurrentStudio: "aid_tattoo",
+		Services:      []string{"tattoo"}}
+	artists[2] = models.Artist{Name: "xizi",
+		LocationNow:   "Shanghai, China",
+		CurrentStudio: "chushangfeng",
+		Services:      []string{"tattoo", "design", "henna", "piercing"}}
+	artists[3] = models.Artist{Name: "kate",
+		Services: []string{"tattoo", "design"}}
+	artists[4] = models.Artist{Name: "klimin",
+		LocationNow:   "Gatchina, Russia",
+		CurrentStudio: "aid_tattoo",
+		Services:      []string{"tattoo", "design"}}
+	artists[5] = models.Artist{Name: "zhenfeng",
+		LocationNow:   "Shanghai, China",
+		CurrentStudio: "chushangfeng",
+		Services:      []string{"tattoo", "design"}}
+	artists[6] = models.Artist{Name: "s-o",
+		LocationNow:   "Shanghai, China",
+		CurrentStudio: "chushangfeng",
+		Services:      []string{"tattoo", "design"}}
+	artists[7] = models.Artist{Name: "gabchik",
+		Services: []string{"tattoo", "design"}}
 	for _, artist := range artists {
 		for _, service := range artist.Services {
 			go func(name, service string) {
