@@ -150,35 +150,21 @@ func main() {
 
 	artists := make(models.Artists, 8)
 	artists[0] = models.Artist{Name: "gogo",
-		LocationNow:   "Shanghai, China",
-		CurrentStudio: "chushangfeng",
-		Services:      []string{"tattoo", "henna", "piercing", "design", "dreadlocks"}}
+		Services: []string{"tattoo", "henna", "piercing", "design", "dreadlocks"}}
 	artists[1] = models.Artist{Name: "aid",
-		LocationNow:   "Gatchina, Russia",
-		CurrentStudio: "aid_tattoo",
-		Services:      []string{"tattoo"}}
+		Services: []string{"tattoo"}}
 	artists[2] = models.Artist{Name: "xizi",
-		LocationNow:   "Shanghai, China",
-		CurrentStudio: "chushangfeng",
-		Services:      []string{"tattoo", "design", "henna", "piercing"}}
+		Services: []string{"tattoo", "design", "henna", "piercing"}}
 	artists[3] = models.Artist{Name: "kate",
 		Services: []string{"tattoo", "design"}}
 	artists[4] = models.Artist{Name: "klimin",
-		LocationNow:   "Gatchina, Russia",
-		CurrentStudio: "aid_tattoo",
-		Services:      []string{"tattoo", "design"}}
+		Services: []string{"tattoo", "design"}}
 	artists[5] = models.Artist{Name: "zhenfeng",
-		LocationNow:   "Shanghai, China",
-		CurrentStudio: "chushangfeng",
-		Services:      []string{"tattoo", "design"}}
+		Services: []string{"tattoo", "design"}}
 	artists[6] = models.Artist{Name: "s-o",
-		LocationNow:   "Shanghai, China",
-		CurrentStudio: "chushangfeng",
-		Services:      []string{"tattoo", "design"}}
+		Services: []string{"tattoo", "design"}}
 	artists[7] = models.Artist{Name: "gabchik",
-		LocationNow:   "Shanghai, China",
-		CurrentStudio: "chushangfeng",
-		Services:      []string{"tattoo", "design"}}
+		Services: []string{"tattoo", "design"}}
 	for _, artist := range artists {
 		for _, service := range artist.Services {
 			go func(name, service string) {
