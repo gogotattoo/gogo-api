@@ -117,7 +117,10 @@ func upload(w http.ResponseWriter, r *http.Request) {
 
 		watermark.WatermarkPath = os.Getenv("GOPATH") + "/src/github.com/gogotattoo/gogo-upload/watermarks/"
 
-		if artistName == "zhenfeng" || artistName == "gabchik" || artistName == "xizi" {
+		if artistName == "zhenfeng" ||
+			artistName == "gabchik" ||
+			artistName == "xizi" ||
+			artistName == "s-o" {
 			watermark.V4 = true
 			watermark.V3 = false
 			watermark.WatermarkPath += "v4/"
