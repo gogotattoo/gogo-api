@@ -16,6 +16,7 @@ import (
 	"github.com/gogotattoo/gogo-api/artwork"
 	"github.com/gogotattoo/gogo-upload/cli"
 	"github.com/gogotattoo/gogo-upload/watermark"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -176,7 +177,7 @@ func main() {
 		}
 	}
 
-	log.Fatal(http.ListenAndServe(":12345", Log(router)))
+	log.Fatal(http.ListenAndServe(":12345", handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(Log(router))))
 }
 
 // Log prints basic http request info
