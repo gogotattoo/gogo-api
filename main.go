@@ -121,7 +121,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		if artistName == "zhenfeng" ||
 			artistName == "gabchik" ||
 			artistName == "xizi" ||
-			artistName == "s-o" {
+			artistName == "aidehua" {
 			watermark.V4 = true
 			watermark.V3 = false
 			watermark.WatermarkPath += "v4/"
@@ -165,7 +165,7 @@ func main() {
 		Services: []string{"tattoo", "design"}}
 	artists[5] = models.Artist{Name: "zhenfeng",
 		Services: []string{"tattoo", "design"}}
-	artists[6] = models.Artist{Name: "s-o",
+	artists[6] = models.Artist{Name: "aidehua",
 		Services: []string{"tattoo", "design"}}
 	artists[7] = models.Artist{Name: "gabchik",
 		Services: []string{"tattoo", "design"}}
