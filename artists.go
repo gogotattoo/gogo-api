@@ -43,7 +43,7 @@ func Artists(w http.ResponseWriter, r *http.Request) {
 		LocationNow:   "Shaxi, Jiangsu",
 		CurrentStudio: "tangka",
 		Services:      []string{"tattoo", "design", "piercing"},
-		AvatarIpfs:    "Qmdyoyf2qmDJ3BqU9iSkpmQejCjq4iCWNwCo8K7TcvhW5K"}
+		AvatarIpfs:    "QmWfgCVZTJFpoWGCVxqXNUvZyVQQC2NzBktXPWcwPBJyeW"}
 	artists[7] = models.Artist{Link: "gabchik", Name: "Gabchik",
 		LocationNow:   "Shanghai, China",
 		CurrentStudio: "chushangfeng",
